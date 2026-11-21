@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiniVault — Expanded Blind Box Studio</title>
+  <style>
+    :root {
+      --bg: #0f1016;
+      --surface: #181a24;
+      --surface-2: #222534;
+      --text: #f4f5f9;
+      --muted: #9aa0b8;
+      --accent: #ff5c8a;
+      --accent-2: #7c5cff;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top right, #1e1938 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand h1 {
+      font-size: 1.65rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: transform 0.12s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      padding: 10px 16px;
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 14px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 999px;
+    }
+
+    .filter-btn.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .box-art {
+      height: 116px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 3rem;
+      background: linear-gradient(145deg, rgba(255,92,138,0.16), rgba(124,92,255,0.16));
+      border: 1px solid var(--border);
+    }
+
+    .series-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    .card h3 {
+      font-size: 1.08rem;
+      margin-top: 2px;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-top: 4px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .price {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .collection-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .collection-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .pull-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .pull-item .emoji { font-size: 2rem; }
+    .pull-item .name { font-size: 0.9rem; font-weight: 600; margin-top: 6px; }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+
+    .badge.Common { background: rgba(100,116,139,0.25); color: #cbd5e1; }
+    .badge.Rare { background: rgba(56,189,248,0.22); color: #7dd3fc; }
+    .badge.Secret { background: rgba(251,191,36,0.25); color: #fde68a; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      place-items: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open { display: grid; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 380px;
+      width: 100%;
+      padding: 24px;
+      text-align: center;
+      animation: popIn 0.25s ease;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .reveal-emoji {
+      font-size: 4.2rem;
+      margin: 14px 0;
+    }
+
+    .empty-msg {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1>MiniVault Blind Boxes</h1>
+        <p>12 curated blind boxes across 3 series — unbox, collect, and track rarities</p>
+      </div>
+      <div class="toolbar">
+        <div class="pill">Wallet: $<span id="wallet">150</span></div>
+        <button class="btn-secondary" id="topUpBtn">+$50 Top Up</button>
+        <button class="btn-primary" id="downloadBtn">Download HTML</button>
+      </div>
+    </header>
+
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-series="All">All (12)</button>
+      <button class="filter-btn" data-series="Neon Street">Neon Street (4)</button>
+      <button class="filter-btn" data-series="Cozy Café">Cozy Café (4)</button>
+      <button class="filter-btn" data-series="Starlight Voyage">Starlight Voyage (4)</button>
+    </div>
+
+    <main class="grid" id="boxGrid"></main>
+
+    <section class="collection-section">
+      <div class="collection-header">
+        <h2>Your Collection (<span id="pullCount">0</span>)</h2>
+        <button class="btn-secondary" id="clearCollectionBtn">Clear Shelf</button>
+      </div>
+      <div class="collection-grid" id="collectionGrid">
+        <p class="empty-msg">No items pulled yet. Open any blind box above to start collecting.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modalBox">
+      <div class="series-tag" id="modalSeries"></div>
+      <h2 id="modalBoxName"></h2>
+      <div class="reveal-emoji" id="modalEmoji"></div>
+      <h3 id="modalItemName"></h3>
+      <span class="badge" id="modalRarity"></span>
+      <p id="modalDesc" style="color: var(--muted); font-size: 0.88rem; margin: 12px 0 18px;"></p>
+      <button class="btn-primary" style="width: 100%;" id="closeModalBtn">Add to Collection</button>
+    </div>
+  </div>
+
+  <script>
+    const BLIND_BOXES = [
+      {
+        id: "cyber-bot",
+        series: "Neon Street",
+        name: "Cyber Bot Box",
+        price: 15,
+        boxIcon: "🤖",
+        desc: "Compact synth-figures wired for midnight arcade runs.",
+        pool: [
+          { name: "Bit Runner", emoji: "👾", rarity: "Common", weight: 60, note: "Standard patrol unit with pixel visor." },
+          { name: "Volt DJ", emoji: "🎧", rarity: "Rare", weight: 30, note: "Spins bass drops at 140 BPM." },
+          { name: "Chrono Core", emoji: "💠", rarity: "Secret", weight: 10, note: "1-in-10 prism core with time-warp trim." }
+        ]
+      },
+      {
+        id: "skate-crew",
+        series: "Neon Street",
+        name: "Skate Crew Box",
+        price: 15,
+        boxIcon: "🛹",
+        desc: "Street-ready mini riders with glowing deck graphics.",
+        pool: [
+          { name: "Ollie Fox", emoji: "🦊", rarity: "Common", weight: 60, note: "Always lands clean on concrete." },
+          { name: "Laser Kickflip", emoji: "⚡", rarity: "Rare", weight: 30, note: "Leaves a neon spark trail." },
+          { name: "Golden Deck", emoji: "🏆", rarity: "Secret", weight: 10, note: "Champion edition trophy skater." }
+        ]
+      },
+      {
+        id: "graffiti-cat",
+        series: "Neon Street",
+        name: "Graffiti Cat Box",
+        price: 18,
+        boxIcon: "🐱",
+        desc: "Aerosol-splashed felines tagging alleyway walls.",
+        pool: [
+          { name: "Taggy", emoji: "🐈‍⬛", rarity: "Common", weight: 60, note: "Classic stealth black alley cat." },
+          { name: "Spray Nova", emoji: "🎨", rarity: "Rare", weight: 30, note: "Carries multi-tone paint canisters." },
+          { name: "Astral Meow", emoji: "🌌", rarity: "Secret", weight: 10, note: "Cosmic galaxy coat secret pull." }
+        ]
+      },
+      {
+        id: "night-rider",
+        series: "Neon Street",
+        name: "Night Rider Box",
+        price: 20,
+        boxIcon: "🏍️",
+        desc: "High-speed cruisers built for rain-slicked avenues.",
+        pool: [
+          { name: "Courier Ace", emoji: "🛵", rarity: "Common", weight: 60, note: "Fastest delivery across the block." },
+          { name: "Drift Phantom", emoji: "💨", rarity: "Rare", weight: 30, note: "Silky cornering with twin tail-lights." },
+          { name: "Starlight GT", emoji: "🌠", rarity: "Secret", weight: 10, note: "Ultra-rare shooting-star edition." }
+        ]
+      },
+      {
+        id: "matcha-bunny",
+        series: "Cozy Café",
+        name: "Matcha Bunny Box",
+        price: 15,
+        boxIcon: "🍵",
+        desc: "Whisked green-tea bunnies resting on ceramic cups.",
+        pool: [
+          { name: "Uji Sprout", emoji: "🐰", rarity: "Common", weight: 60, note: "Sweet, calm, and freshly whisked." },
+          { name: "Latte Swirl", emoji: "🥛", rarity: "Rare", weight: 30, note: "Layered with creamy oat foam." },
+          { name: "Ceremonial Gold", emoji: "✨", rarity: "Secret", weight: 10, note: "First-harvest gold leaf secret bunny." }
+        ]
+      },
+      {
+        id: "bakery-pals",
+        series: "Cozy Café",
+        name: "Bakery Pals Box",
+        price: 15,
+        boxIcon: "🥐",
+        desc: "Warm pastry companions fresh from the morning oven.",
+        pool: [
+          { name: "Butter Croissant", emoji: "🥐", rarity: "Common", weight: 60, note: "Flaky golden layers every morning." },
+          { name: "Berry Tartlet", emoji: "🍓", rarity: "Rare", weight: 30, note: "Topped with glazed wild berries." },
+          { name: "Royal Macaron", emoji: "👑", rarity: "Secret", weight: 10, note: "Crowned patisserie secret pull." }
+        ]
+      },
+      {
+        id: "rainy-window",
+        series: "Cozy Café",
+        name: "Rainy Window Box",
+        price: 18,
+        boxIcon: "🌧️",
+        desc: "Quiet afternoon figures made for lo-fi study sessions.",
+        pool: [
+          { name: "Bookworm Bear", emoji: "🐻", rarity: "Common", weight: 60, note: "Curled up with a paperback novel." },
+          { name: "Lantern Frog", emoji: "🐸", rarity: "Rare", weight: 30, note: "Holds a warm glowing desk lamp." },
+          { name: "Rainbow Mist", emoji: "🌈", rarity: "Secret", weight: 10, note: "Appears right after the storm clears." }
+        ]
+      },
+      {
+        id: "boba-friends",
+        series: "Cozy Café",
+        name: "Boba Friends Box",
+        price: 20,
+        boxIcon: "🧋",
+        desc: "Chewy tapioca buddies floating in milk tea.",
+        pool: [
+          { name: "Pearl Cub", emoji: "🧸", rarity: "Common", weight: 60, note: "Brown-sugar boba bestie." },
+          { name: "Taro Puff", emoji: "💜", rarity: "Rare", weight: 30, note: "Velvety purple taro blend." },
+          { name: "Diamond Boba", emoji: "💎", rarity: "Secret", weight: 10, note: "Sparkling crystal pearl secret edition." }
+        ]
+      },
+      {
+        id: "lunar-rover",
+        series: "Starlight Voyage",
+        name: "Lunar Rover Box",
+        price: 16,
+        boxIcon: "🌙",
+        desc: "Moon-dusted explorers mapping crater outposts.",
+        pool: [
+          { name: "Crater Scout", emoji: "🧑‍🚀", rarity: "Common", weight: 60, note: "Collects moon rock samples." },
+          { name: "Solar Wing", emoji: "🛰️", rarity: "Rare", weight: 30, note: "Recharges under bright starlight." },
+          { name: "Eclipse Commander", emoji: "🌑", rarity: "Secret", weight: 10, note: "Rare ring-of-fire lunar commander." }
+        ]
+      },
+      {
+        id: "nebula-whale",
+        series: "Starlight Voyage",
+        name: "Nebula Whale Box",
+        price: 18,
+        boxIcon: "🐋",
+        desc: "Celestial leviathans gliding through stardust currents.",
+        pool: [
+          { name: "Drift Calf", emoji: "🐳", rarity: "Common", weight: 60, note: "Hums gentle space lullabies." },
+          { name: "Comet Fin", emoji: "☄️", rarity: "Rare", weight: 30, note: "Trails icy stardust ribbons." },
+          { name: "Aurora Sovereign", emoji: "🪄", rarity: "Secret", weight: 10, note: "Shimmers with northern-light ribbons." }
+        ]
+      },
+      {
+        id: "star-botanist",
+        series: "Starlight Voyage",
+        name: "Star Botanist Box",
+        price: 18,
+        boxIcon: "🪐",
+        desc: "Intergalactic gardeners tending bioluminescent flora.",
+        pool: [
+          { name: "Sproutling", emoji: "🌱", rarity: "Common", weight: 60, note: "Waters zero-gravity seedlings." },
+          { name: "Moonflower", emoji: "🌸", rarity: "Rare", weight: 30, note: "Blooms exclusively at midnight." },
+          { name: "Supernova Lotus", emoji: "🪷", rarity: "Secret", weight: 10, note: "Radiates warm stardust petals." }
+        ]
+      },
+      {
+        id: "warp-express",
+        series: "Starlight Voyage",
+        name: "Warp Express Box",
+        price: 22,
+        boxIcon: "🚀",
+        desc: "Deep-space ticket collectors riding hyper-rails.",
+        pool: [
+          { name: "Conductor Pip", emoji: "🎟️", rarity: "Common", weight: 60, note: "Punches star-line boarding passes." },
+          { name: "Beacon Fox", emoji: "🏮", rarity: "Rare", weight: 30, note: "Guides trains across dark sectors." },
+          { name: "Infinity Engine", emoji: "🔮", rarity: "Secret", weight: 10, note: "Powers nonstop cross-galaxy travel." }
+        ]
+      }
+    ];
+
+    let wallet = 150;
+    let activeSeries = "All";
+    let collection = [];
+
+    const walletEl = document.getElementById("wallet");
+    const boxGridEl = document.getElementById("boxGrid");
+    const collectionGridEl = document.getElementById("collectionGrid");
+    const pullCountEl = document.getElementById("pullCount");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+
+    function weightedPick(pool) {
+      const total = pool.reduce((sum, item) => sum + item.weight, 0);
+      let roll = Math.random() * total;
+      for (const item of pool) {
+        roll -= item.weight;
+        if (roll <= 0) return item;
+      }
+      return pool[0];
+    }
+
+    function renderBoxes() {
+      const filtered = activeSeries === "All"
+        ? BLIND_BOXES
+        : BLIND_BOXES.filter(b => b.series === activeSeries);
+
+      boxGridEl.innerHTML = filtered.map(box => `
+        <article class="card">
+          <div>
+            <div class="box-art">${box.boxIcon}</div>
+            <div style="margin-top: 12px;">
+              <span class="series-tag">${box.series}</span>
+              <h3>${box.name}</h3>
+              <p>${box.desc}</p>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span class="price">$${box.price}</span>
+            <button class="btn-primary" onclick="openBox('${box.id}')">Unbox</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderCollection() {
+      pullCountEl.textContent = collection.length;
+      if (collection.length === 0) {
+        collectionGridEl.innerHTML = `<p class="empty-msg">No items pulled yet. Open any blind box above to start collecting.</p>`;
+        return;
+      }
+      collectionGridEl.innerHTML = collection.map(item => `
+        <div class="pull-item">
+          <div class="emoji">${item.emoji}</div>
+          <div class="name">${item.name}</div>
+          <span class="badge ${item.rarity}">${item.rarity}</span>
+        </div>
+      `).join("");
+    }
+
+    function updateWallet() {
+      walletEl.textContent = wallet;
+    }
+
+    window.openBox = function(boxId) {
+      const box = BLIND_BOXES.find(b => b.id === boxId);
+      if (!box) return;
+      if (wallet < box.price) {
+        alert("Not enough balance! Click '+$50 Top Up' to add funds.");
+        return;
+      }
+      wallet -= box.price;
+      updateWallet();
+
+      const pulled = weightedPick(box.pool);
+      collection.unshift(pulled);
+      renderCollection();
+
+      document.getElementById("modalSeries").textContent = box.series;
+      document.getElementById("modalBoxName").textContent = box.name;
+      document.getElementById("modalEmoji").textContent = pulled.emoji;
+      document.getElementById("modalItemName").textContent = pulled.name;
+      document.getElementById("modalDesc").textContent = pulled.note;
+
+      const rarityBadge = document.getElementById("modalRarity");
+      rarityBadge.textContent = pulled.rarity;
+      rarityBadge.className = `badge ${pulled.rarity}`;
+
+      modalBackdrop.classList.add("open");
+    };
+
+    document.getElementById("closeModalBtn").addEventListener("click", () => {
+      modalBackdrop.classList.remove("open");
+    });
+
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) modalBackdrop.classList.remove("open");
+    });
+
+    document.getElementById("topUpBtn").addEventListener("click", () => {
+      wallet += 50;
+      updateWallet();
+    });
+
+    document.getElementById("clearCollectionBtn").addEventListener("click", () => {
+      collection = [];
+      renderCollection();
+    });
+
+    document.getElementById("filters").addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeSeries = btn.dataset.series;
+      renderBoxes();
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", () => {
+      const htmlContent = "<!DOCTYPE html>
+" + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "blind-box-shop-v2.html";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    renderBoxes();
+    renderCollection();
+  </script>
+</body>
+</html>
